@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   nameMessageTimeContainer: {
     flexDirection: 'row',
-    flexShrink: 1,
+    flex: 1,
   },
   nameMessageContainer: {
     flexGrow: 1,

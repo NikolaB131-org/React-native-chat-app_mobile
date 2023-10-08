@@ -6,12 +6,23 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Pressable, StatusBar, StyleSheet } from 'react-native';
 import ChatsPage from './static/ChatsPage';
 import SearchSvg from './assets/search.svg';
+import LoginPage from './static/LoginPage';
 
-const Stack = createStackNavigator();
+export type RootStackParamList = {
+  Login: undefined;
+  Chats: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const getHeaderBackground = () => (
   <>
-    <LinearGradient style={styles.linearGradient} colors={[Colors.primary, '#B36BEB']} useAngle={true} angle={30} />
+    <LinearGradient
+      style={styles.linearGradient}
+      colors={[Colors.primary, Colors.secondary]}
+      useAngle={true}
+      angle={30}
+    />
     <StatusBar translucent={true} backgroundColor={'transparent'} barStyle={'light-content'} />
   </>
 );
@@ -28,11 +39,12 @@ function App() {
       <Stack.Navigator
         screenOptions={{
           headerBackground: getHeaderBackground,
-          headerTintColor: Colors.secondary,
+          headerTintColor: Colors.text,
           headerTitleAlign: 'center',
           headerRight: getSearchButton,
           cardStyle: { backgroundColor: '#FFF' },
         }}>
+        <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Chats" component={ChatsPage} />
       </Stack.Navigator>
     </NavigationContainer>
