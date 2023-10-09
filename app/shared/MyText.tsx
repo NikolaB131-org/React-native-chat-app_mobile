@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, TextProps } from 'react-native';
+import { Colors } from '../constants/colors';
 
 type Props = {
-  children: React.ReactNode;
-  style?: object;
-  numberOfLines?: number;
+  style?: TextProps['style'];
+  children?: TextProps['children'];
+  numberOfLines?: TextProps['numberOfLines'];
 };
 
 function MyText({ style, children, numberOfLines }: Props) {
@@ -17,7 +18,7 @@ function MyText({ style, children, numberOfLines }: Props) {
 
 const styles = StyleSheet.create({
   text: {
-    color: '#2a2a2a',
+    color: Colors.primaryText,
   },
 });
 

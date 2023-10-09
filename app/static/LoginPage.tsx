@@ -1,34 +1,76 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useAppDispatch } from '../core/redux/hooks';
+import { useSelector } from 'react-redux';
+import { authUserIdSelector, authStatusSelector, authErrorMessageSelector } from '../core/auth/selectors';
+import { login } from '../core/auth/thunks';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import MyTextInput from '../shared/MyTextInput';
 import MyText from '../shared/MyText';
+import Spinner from '../shared/Spinner';
 import { Colors } from '../constants/colors';
 
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
 function LoginPage({ navigation }: Props) {
-  const [inputValue, setInputValue] = React.useState('');
+  const dispatch = useAppDispatch();
+  const authUserId = useSelector(authUserIdSelector);
+  const authStatus = useSelector(authStatusSelector);
+  const authErrorMessage = useSelector(authErrorMessageSelector);
+
+  const [inputValue, setInputValue] = useState('');
 
   const onButtonPress = async () => {
-    navigation.push('Chats');
+    if (inputValue.length > 2) {
+      dispatch(login({ username: inputValue }));
+    } else {
+      Alert.alert('Validation error', 'User name must contain at least 3 characters');
+    }
   };
 
+  useEffect(() => {
+    switch (authStatus) {
+      case 'idle': {
+        if (authUserId) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Chats' }],
+          });
+        }
+        break;
+      }
+      case 'failed': {
+        Alert.alert('Error', authErrorMessage);
+        break;
+      }
+    }
+  }, [navigation, authUserId, authStatus, authErrorMessage]);
+
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.container}>
-        <TextInput
-          style={[styles.inputAndButton, styles.input]}
-          placeholder="Username"
-          onChangeText={setInputValue}
-          value={inputValue}
-        />
-        <Pressable style={[styles.inputAndButton, styles.button]} onPress={onButtonPress}>
-          <MyText style={styles.buttonText}>Login</MyText>
-        </Pressable>
-        <MyText style={styles.hintText}>If you are not registered, your account will be created automatically.</MyText>
+    <>
+      <View style={styles.wrapper}>
+        <View style={styles.container}>
+          <MyTextInput
+            style={[styles.inputAndButton, styles.input]}
+            placeholder="Username"
+            onChangeText={setInputValue}
+            value={inputValue}
+          />
+          <Pressable style={[styles.inputAndButton, styles.button]} onPress={onButtonPress}>
+            <MyText style={styles.buttonText}>Login</MyText>
+          </Pressable>
+          <MyText style={styles.hintText}>
+            If you are not registered, your account will be created automatically.
+          </MyText>
+        </View>
       </View>
-    </View>
+      {authStatus === 'loading' && (
+        <View style={styles.spinnerContainer}>
+          <Spinner />
+        </View>
+      )}
+    </>
   );
 }
 
@@ -61,13 +103,23 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     fontWeight: '500',
-    color: Colors.text,
+    color: Colors.secondaryText,
   },
   hintText: {
     paddingHorizontal: 10,
     fontSize: 11,
     textAlign: 'center',
     color: Colors.grey,
+  },
+  spinnerContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 });
 
