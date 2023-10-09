@@ -1,181 +1,45 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import ChatPreview, { Props as ChatPreviewProps, getChatPreviewImageContainerWidth } from '../shared/ChatPreview';
+import ChatPreview, { getChatPreviewImageContainerWidth } from '../shared/ChatPreview';
 import { Colors } from '../constants/colors';
+import { useSelector } from 'react-redux';
+import { chatsChatsSelector } from '../core/chats/selectors';
+import { useAppDispatch } from '../core/redux/hooks';
+import Config from 'react-native-config';
+import { authUserIdSelector } from '../core/auth/selectors';
+import websockets from '../core/websockets';
 
-const items: ChatPreviewProps[] = [
-  {
-    avatarImageUrl:
-      'https://get.pxhere.com/photo/water-nature-forest-bridge-sunlight-leaf-suspension-bridge-green-jungle-rope-bridge-habitat-nonbuilding-structure-81677.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'I am fine. What about you?',
-    lastMessageTime: '18:10',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Lauren Spencer',
-    lastMessage: 'Hey! how are you?',
-    lastMessageTime: '15:17',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blala ldlsa dalsd adasld ad234 32424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadals dadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-  {
-    avatarImageUrl:
-      'https://blog.pshares.org/wp-content/uploads/sites/10/2012/02/dawn-dusk-hd-wallpaper-36717-1536x956.jpg',
-    name: 'Eugene Hanson',
-    lastMessage: 'Hey! how are you? blalaldlsadalsdadasldad23432424',
-    lastMessageTime: '12:59',
-  },
-];
-
-function ItemsSeparator() {
-  return <View style={styles.itemsSeparator} />;
-}
+const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
 function ChatsPage() {
+  const dispatch = useAppDispatch();
+  const chats = useSelector(chatsChatsSelector);
+  const userId = useSelector(authUserIdSelector);
+
+  useEffect(() => {
+    if (userId && Config.API_URL_WS) {
+      console.log('RERENDER2');
+      const ws = new WebSocket(Config.API_URL_WS);
+      websockets.start(ws, dispatch, userId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onChatPreviewPress = (id: string) => {
+    console.log(id);
+  };
+
   return (
     <FlatList
       contentContainerStyle={styles.container}
-      data={items}
+      data={chats}
       ItemSeparatorComponent={ItemsSeparator}
       renderItem={({ item }) => (
         <ChatPreview
-          avatarImageUrl={item.avatarImageUrl}
+          imageUrl={item.imageUrl}
           name={item.name}
-          lastMessage={item.lastMessage}
-          lastMessageTime={item.lastMessageTime}
+          messages={item.messages}
+          onPress={() => onChatPreviewPress(item.id)}
         />
       )}
     />

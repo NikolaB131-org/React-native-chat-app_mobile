@@ -1,40 +1,65 @@
 import React from 'react';
+import { MessageType } from '../../../backend/src/modules/message/message.model';
+import { prependZero } from '../core/utils/prependZero';
 import { GestureResponderEvent, Image, Pressable, StyleSheet, View } from 'react-native';
+import ChatDefaultSvg from '../assets/chat_default.svg';
 import MyText from './MyText';
 import { Colors } from '../constants/colors';
 
 const IMAGE_WIDTH = 55;
-const IMAGE_HEIGHT = IMAGE_WIDTH;
 const IMAGE_MARGIN_RIGHT = 16;
 
 export const getChatPreviewImageContainerWidth = () => IMAGE_WIDTH + IMAGE_MARGIN_RIGHT;
 
-export type Props = {
-  avatarImageUrl: string;
+type Props = {
+  imageUrl?: string;
   name: string;
-  lastMessage: string;
-  lastMessageTime: string;
+  messages: MessageType[];
   onPress?: ((event: GestureResponderEvent) => void) | null;
 };
 
-function ChatPreview({ avatarImageUrl, name, lastMessage, lastMessageTime, onPress }: Props) {
+function ChatPreview({ imageUrl, name, messages, onPress }: Props) {
+  const lastMessage = messages.at(-1);
+  const lastMessageText: string = lastMessage?.message ?? '';
+
+  const getLastMessageDate = (): string => {
+    if (!lastMessage) {
+      return '';
+    }
+
+    const date = new Date(lastMessage.createdAt);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours();
+    const miniutes = date.getMinutes();
+
+    const dateNow = new Date();
+    const yearNow = dateNow.getFullYear();
+    const monthNow = dateNow.getMonth() + 1;
+    const dayNow = dateNow.getDate();
+
+    if (year === yearNow && month === monthNow && day === dayNow) {
+      return `${prependZero(hours)}:${prependZero(miniutes)}`;
+    }
+    return `${prependZero(day)}/${prependZero(month)}/${year}`;
+  };
+
   return (
     <Pressable style={styles.container} onPress={onPress}>
-      <Image
-        style={styles.image}
-        source={{ uri: avatarImageUrl }}
-        width={IMAGE_WIDTH}
-        height={IMAGE_HEIGHT}
-        borderRadius={1000} // circle
-      />
+      {imageUrl ? (
+        <Image style={styles.image} source={{ uri: imageUrl }} width={IMAGE_WIDTH} height={IMAGE_WIDTH} />
+      ) : (
+        <ChatDefaultSvg style={styles.image} width={IMAGE_WIDTH} height={IMAGE_WIDTH} />
+      )}
       <View style={styles.nameMessageTimeContainer}>
         <View style={styles.nameMessageContainer}>
           <MyText style={styles.name}>{name}</MyText>
           <MyText style={styles.lastMessage} numberOfLines={1}>
-            {lastMessage}
+            {lastMessageText}
           </MyText>
         </View>
-        <MyText style={styles.time}>{lastMessageTime}</MyText>
+        <MyText style={styles.date}>{getLastMessageDate()}</MyText>
       </View>
     </Pressable>
   );
@@ -47,6 +72,7 @@ const styles = StyleSheet.create({
   },
   image: {
     marginRight: IMAGE_MARGIN_RIGHT,
+    borderRadius: 1000,
   },
   nameMessageTimeContainer: {
     flexDirection: 'row',
@@ -64,7 +90,7 @@ const styles = StyleSheet.create({
     color: Colors.grey,
     fontSize: 15,
   },
-  time: {
+  date: {
     color: Colors.grey,
     fontSize: 12,
   },
