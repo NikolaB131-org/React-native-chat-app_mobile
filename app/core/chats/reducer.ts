@@ -1,13 +1,14 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
 import { WSClientAllChatsEvent, WSClientReceiveMessageEvent } from '../../../../backend/src/utils/websockets/types';
-import { deleteChat, leave, updateName } from './thunks';
+import { deleteChat, join, leave, search, updateName } from './thunks';
 
 const initialState: InitiialState = {
   chats: [],
   status: 'idle',
   errorMessage: '',
   currentChatName: '',
+  searchedChats: [],
 };
 
 const slice = createSlice({
@@ -52,6 +53,23 @@ const slice = createSlice({
           state.errorMessage = 'An error occurred while deleting chat';
         }
       })
+      .addCase(join.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(join.fulfilled, (state, action) => {
+        if (state.chats) {
+          state.chats = [...state.chats, action.payload];
+        }
+        state.status = 'idle';
+      })
+      .addCase(join.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
+        }
+      })
       .addCase(leave.pending, state => {
         state.status = 'loading';
       })
@@ -87,6 +105,21 @@ const slice = createSlice({
           state.errorMessage = action.payload;
         } else {
           state.errorMessage = 'An error occurred while deleting chat';
+        }
+      })
+      .addCase(search.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(search.fulfilled, (state, action) => {
+        state.searchedChats = action.payload;
+        state.status = 'idle';
+      })
+      .addCase(search.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while searching for chats';
         }
       });
   },

@@ -13,11 +13,13 @@ import Keychain from 'react-native-keychain';
 import { useAppDispatch } from './core/redux/hooks';
 import { setUserId } from './core/auth/reducer';
 import { authUserIdSelector } from './core/auth/selectors';
+import SearchPage from './static/SearchPage';
 
 export type RootStackParamList = {
   Login: undefined;
   Chats: undefined;
   Chat: { chatId: string; chatName: string };
+  Search: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -67,6 +69,7 @@ function App() {
           <>
             <Stack.Screen name="Chats" component={ChatsPage} />
             <Stack.Screen name="Chat" component={ChatPage} />
+            <Stack.Screen name="Search" component={SearchPage} />
           </>
         ) : (
           <Stack.Screen

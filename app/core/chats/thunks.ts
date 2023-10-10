@@ -4,6 +4,31 @@ import { getMessageIfExists } from '../redux/utils/getMessageIfExists';
 import { authUserIdSelector } from '../auth/selectors';
 import { AppState } from '../redux/store';
 import { UpdateNamePayload } from './types';
+import { ChatsSearchResponse } from '../../../../backend/src/modules/chats/chats.service';
+import { ChatType } from '../../../../backend/src/modules/chats/chats.model';
+
+export const updateName = createAsyncThunk<UpdateNamePayload, UpdateNamePayload, { state: AppState }>(
+  'chats/updateName',
+  async (payload, { getState, rejectWithValue }) => {
+    try {
+      const userId = authUserIdSelector(getState()) ?? '';
+      const response = await fetch(`${Config.API_URL_HTTP}/chats/${payload.chatId}/?name=${payload.name}`, {
+        method: 'PATCH', // CRUD UPDATE
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${userId}`,
+        },
+      });
+      if (!response.ok) {
+        return rejectWithValue((await response.json()).errMessage);
+      }
+      return payload;
+    } catch (error) {
+      return rejectWithValue(getMessageIfExists(error));
+    }
+  },
+);
 
 export const deleteChat = createAsyncThunk<string, string, { state: AppState }>(
   'chats/deleteChat',
@@ -28,13 +53,13 @@ export const deleteChat = createAsyncThunk<string, string, { state: AppState }>(
   },
 );
 
-export const leave = createAsyncThunk<string, string, { state: AppState }>(
-  'chats/leave',
+export const search = createAsyncThunk<ChatsSearchResponse, string, { state: AppState }>(
+  'chats/search',
   async (payload, { getState, rejectWithValue }) => {
     try {
       const userId = authUserIdSelector(getState()) ?? '';
-      const response = await fetch(`${Config.API_URL_HTTP}/chats/leave/${payload}`, {
-        method: 'DELETE',
+      const response = await fetch(`${Config.API_URL_HTTP}/chats/search?text=${payload}`, {
+        method: 'GET',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -44,20 +69,43 @@ export const leave = createAsyncThunk<string, string, { state: AppState }>(
       if (!response.ok) {
         return rejectWithValue((await response.json()).errMessage);
       }
-      return payload;
+      return await response.json();
     } catch (error) {
       return rejectWithValue(getMessageIfExists(error));
     }
   },
 );
 
-export const updateName = createAsyncThunk<UpdateNamePayload, UpdateNamePayload, { state: AppState }>(
-  'chats/updateName',
+export const join = createAsyncThunk<ChatType, string, { state: AppState }>(
+  'chats/join',
   async (payload, { getState, rejectWithValue }) => {
     try {
       const userId = authUserIdSelector(getState()) ?? '';
-      const response = await fetch(`${Config.API_URL_HTTP}/chats/${payload.chatId}/?name=${payload.name}`, {
-        method: 'PATCH', // CRUD UPDATE
+      const response = await fetch(`${Config.API_URL_HTTP}/chats/join/${payload}`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${userId}`,
+        },
+      });
+      if (!response.ok) {
+        return rejectWithValue((await response.json()).errMessage);
+      }
+      return await response.json();
+    } catch (error) {
+      return rejectWithValue(getMessageIfExists(error));
+    }
+  },
+);
+
+export const leave = createAsyncThunk<string, string, { state: AppState }>(
+  'chats/leave',
+  async (payload, { getState, rejectWithValue }) => {
+    try {
+      const userId = authUserIdSelector(getState()) ?? '';
+      const response = await fetch(`${Config.API_URL_HTTP}/chats/leave/${payload}`, {
+        method: 'DELETE',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',

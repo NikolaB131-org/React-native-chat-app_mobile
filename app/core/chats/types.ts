@@ -1,3 +1,4 @@
+import { ChatsSearchResponse } from '../../../../backend/src/modules/chats/chats.service';
 import { WSClientAllChatsEvent } from '../../../../backend/src/utils/websockets/types';
 import { FetchStatus } from '../redux/types';
 
@@ -6,6 +7,7 @@ export type InitiialState = {
   status: FetchStatus;
   errorMessage: string;
   currentChatName: string;
+  searchedChats: ChatsSearchResponse;
 };
 
 export type UpdateNamePayload = {

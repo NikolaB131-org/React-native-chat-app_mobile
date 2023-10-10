@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import ChatPreview, { getChatPreviewImageContainerWidth } from '../shared/ChatPreview';
+import { FlatList, Pressable, StyleSheet } from 'react-native';
+import ChatPreview, { ItemsSeparator } from '../shared/ChatPreview';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import { useSelector } from 'react-redux';
@@ -13,9 +13,6 @@ import { logout } from '../core/auth/thunks';
 import { connect } from '../core/websocket/reducer';
 import Config from 'react-native-config';
 import { Sizes } from '../core/constants/sizes';
-import { Colors } from '../core/constants/colors';
-
-const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
 type Props = StackScreenProps<RootStackParamList, 'Chats'>;
 
@@ -42,7 +39,7 @@ function ChatsPage({ navigation }: Props) {
     });
 
     return (
-      <Pressable onPress={() => console.log(1233)} style={styles.button}>
+      <Pressable onPress={() => navigation.push('Search')} style={styles.button}>
         <SearchSvg width={22} height="100%" />
       </Pressable>
     );
@@ -74,16 +71,7 @@ function ChatsPage({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: Sizes.paddingHorizontal,
-  },
-  itemsSeparator: {
-    height: 1,
-    backgroundColor: Colors.lightGrey,
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: getChatPreviewImageContainerWidth(),
-  },
+  container: { padding: Sizes.paddingHorizontal },
 });
 
 export default ChatsPage;

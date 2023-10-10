@@ -1,7 +1,8 @@
 import React from 'react';
 import { MessageType } from '../../../backend/src/modules/message/message.model';
-import { GestureResponderEvent, Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import ChatDefaultSvg from '../assets/chat_default.svg';
+import PlusSvg from '../assets/plus.svg';
 import MyText from './MyText';
 import { getMessageDate } from '../core/utils/getMessageDate';
 import { Colors } from '../core/constants/colors';
@@ -14,13 +15,15 @@ export const getChatPreviewImageContainerWidth = () => IMAGE_WIDTH + IMAGE_MARGI
 type Props = {
   imageUrl?: string;
   name: string;
-  messages: MessageType[];
-  onPress?: ((event: GestureResponderEvent) => void) | null;
+  messages?: MessageType[];
+  usersNum?: number;
+  onPress?: () => void;
+  onPlusPress?: () => void;
 };
 
-function ChatPreview({ imageUrl, name, messages, onPress }: Props) {
-  const lastMessage = messages.at(-1);
-  const lastMessageText: string = lastMessage?.message ?? '';
+function ChatPreview({ imageUrl, name, messages, usersNum, onPress, onPlusPress }: Props) {
+  const lastMessage = messages?.at(-1);
+  const lastMessageText = lastMessage?.message;
 
   return (
     <Pressable style={styles.container} onPress={onPress}>
@@ -33,10 +36,13 @@ function ChatPreview({ imageUrl, name, messages, onPress }: Props) {
         <View style={styles.nameMessageContainer}>
           <MyText style={styles.name}>{name}</MyText>
           <MyText style={styles.lastMessage} numberOfLines={1}>
-            {lastMessageText}
+            {lastMessageText ? lastMessageText : usersNum !== undefined ? `Users in chat: ${usersNum}` : ''}
           </MyText>
         </View>
-        <MyText style={styles.date}>{lastMessage ? getMessageDate(new Date(lastMessage.createdAt)) : ''}</MyText>
+        {onPlusPress && (
+          <PlusSvg style={styles.plusButton} width={30} height={30} fill={Colors.primary} onPress={onPlusPress} />
+        )}
+        {lastMessage && <MyText style={styles.date}>{getMessageDate(new Date(lastMessage.createdAt))}</MyText>}
       </View>
     </Pressable>
   );
@@ -67,10 +73,30 @@ const styles = StyleSheet.create({
     color: Colors.grey,
     fontSize: 15,
   },
+  plusButton: {
+    alignSelf: 'center',
+    marginVertical: 10,
+    marginLeft: 10,
+  },
   date: {
     color: Colors.grey,
     fontSize: 12,
   },
 });
 
+function ItemsSeparator() {
+  const stylesItemsSeparator = StyleSheet.create({
+    container: {
+      height: 1,
+      backgroundColor: Colors.lightGrey,
+      marginTop: 10,
+      marginBottom: 10,
+      marginLeft: getChatPreviewImageContainerWidth(),
+    },
+  });
+
+  return <View style={stylesItemsSeparator.container} />;
+}
+
 export default ChatPreview;
+export { ItemsSeparator };
