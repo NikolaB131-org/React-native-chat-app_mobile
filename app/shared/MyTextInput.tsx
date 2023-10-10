@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet, TextInput, TextInputProps } from 'react-native';
 import { Colors } from '../core/constants/colors';
 
@@ -7,17 +7,31 @@ type Props = {
   placeholder?: TextInputProps['placeholder'];
   onChangeText?: TextInputProps['onChangeText'];
   value?: TextInputProps['value'];
+  onEndEditing?: TextInputProps['onEndEditing'];
+  autoFocus?: boolean;
 };
 
-function MyText({ style, placeholder, onChangeText, value }: Props) {
+function MyText({ style, placeholder, onChangeText, value, onEndEditing, autoFocus }: Props) {
+  const ref = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        ref.current?.focus();
+      }, 100);
+    }
+  }, [ref, autoFocus]);
+
   return (
     <TextInput
+      ref={ref}
       style={[styles.input, style]}
       placeholderTextColor={Colors.lightGrey}
       selectionColor={Colors.primary}
       placeholder={placeholder}
       onChangeText={onChangeText}
       value={value}
+      onEndEditing={onEndEditing}
     />
   );
 }

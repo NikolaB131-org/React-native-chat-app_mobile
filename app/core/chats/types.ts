@@ -5,4 +5,10 @@ export type InitiialState = {
   chats: WSClientAllChatsEvent['chats'] | null;
   status: FetchStatus;
   errorMessage: string;
+  currentChatName: string;
+};
+
+export type UpdateNamePayload = {
+  chatId: string;
+  name: string;
 };

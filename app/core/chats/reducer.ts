@@ -1,12 +1,13 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
 import { WSClientAllChatsEvent, WSClientReceiveMessageEvent } from '../../../../backend/src/utils/websockets/types';
-import { deleteChat, leave } from './thunks';
+import { deleteChat, leave, updateName } from './thunks';
 
 const initialState: InitiialState = {
   chats: [],
   status: 'idle',
   errorMessage: '',
+  currentChatName: '',
 };
 
 const slice = createSlice({
@@ -16,7 +17,7 @@ const slice = createSlice({
     setStatus(state, action: PayloadAction<InitiialState['status']>) {
       state.status = action.payload;
     },
-    set(state, action: PayloadAction<WSClientAllChatsEvent>) {
+    setChats(state, action: PayloadAction<WSClientAllChatsEvent>) {
       state.chats = action.payload.chats;
     },
     receiveMessage(state, action: PayloadAction<WSClientReceiveMessageEvent>) {
@@ -26,6 +27,9 @@ const slice = createSlice({
         const { id, message, sender, createdAt } = data;
         state.chats[chatIndex].messages = [...state.chats[chatIndex].messages, { id, message, sender, createdAt }];
       }
+    },
+    setCurrentChatName(state, action: PayloadAction<InitiialState['currentChatName']>) {
+      state.currentChatName = action.payload;
     },
   },
   extraReducers: builder => {
@@ -65,10 +69,29 @@ const slice = createSlice({
         } else {
           state.errorMessage = 'An error occurred while deleting chat';
         }
+      })
+      .addCase(updateName.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(updateName.fulfilled, (state, action) => {
+        const { chatId, name } = action.payload;
+        if (state.chats) {
+          state.chats = state.chats.map(chat => (chat.id === chatId ? { ...chat, name } : chat));
+          state.currentChatName = name;
+        }
+        state.status = 'idle';
+      })
+      .addCase(updateName.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
+        }
       });
   },
 });
 
-export const { setStatus, set, receiveMessage } = slice.actions;
+export const { setStatus, setChats, receiveMessage, setCurrentChatName } = slice.actions;
 
 export default slice.reducer;

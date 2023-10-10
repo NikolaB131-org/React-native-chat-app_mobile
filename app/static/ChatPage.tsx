@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import EditSvg from '../assets/edit.svg';
 import LeaveSvg from '../assets/leave.svg';
 import DeleteSvg from '../assets/delete.svg';
 import MyTextInput from '../shared/MyTextInput';
@@ -7,15 +8,21 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import { useAppDispatch } from '../core/redux/hooks';
 import { useSelector } from 'react-redux';
-import { chatsChatsSelector, chatsErrorMessageSelector, chatsStatusSelector } from '../core/chats/selectors';
+import {
+  chatsChatsSelector,
+  chatsCurrentChatNameSelector,
+  chatsErrorMessageSelector,
+  chatsStatusSelector,
+} from '../core/chats/selectors';
 import { ChatType } from '../../../backend/src/modules/chats/chats.model';
 import { sendMessage } from '../core/websocket/reducer';
 import Message from '../shared/Message';
 import SendSvg from '../assets/send.svg';
 import { Colors } from '../core/constants/colors';
 import { Sizes } from '../core/constants/sizes';
-import { deleteChat, leave } from '../core/chats/thunks';
-import { setStatus } from '../core/chats/reducer';
+import { deleteChat, leave, updateName } from '../core/chats/thunks';
+import { setCurrentChatName, setStatus } from '../core/chats/reducer';
+import TextInputModal from '../shared/TextInputModal';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
@@ -28,35 +35,37 @@ function ChatPage({ navigation, route }: Props) {
   const chats = useSelector(chatsChatsSelector);
   const status = useSelector(chatsStatusSelector);
   const errorMessage = useSelector(chatsErrorMessageSelector);
-  const [chatData, setChatData] = useState<ChatType | null>(null);
-  const [inputValue, setInputValue] = useState('');
+  const currentChatName = useSelector(chatsCurrentChatNameSelector);
 
-  const onDeleteButtonPress = async () => {
-    await dispatch(deleteChat(chatId));
-    navigation.goBack();
-  };
+  const [chatData, setChatData] = useState<ChatType | null>(null);
+  const [messageInputValue, setMessageInputValue] = useState('');
+  const [isTextInputModalVisible, setIsTextInputModalVisible] = useState(false);
 
   const onLeaveButtonPress = async () => {
     await dispatch(leave(chatId));
     navigation.goBack();
   };
 
+  const onDeleteButtonPress = async () => {
+    await dispatch(deleteChat(chatId));
+    navigation.goBack();
+  };
+
   const getHeaderRight = () => {
     const styles = StyleSheet.create({
-      container: {
-        flexDirection: 'row',
-        paddingRight: 4,
-      },
-      editButton: { paddingHorizontal: 12 },
-      deleteButton: { paddingHorizontal: 12 },
+      container: { flexDirection: 'row', paddingRight: 4 },
+      button: { paddingHorizontal: 12 },
     });
 
     return (
       <View style={styles.container}>
-        <Pressable style={styles.editButton} onPress={onLeaveButtonPress}>
+        <Pressable style={styles.button} onPress={() => setIsTextInputModalVisible(true)}>
+          <EditSvg width={22} height="100%" />
+        </Pressable>
+        <Pressable style={styles.button} onPress={onLeaveButtonPress}>
           <LeaveSvg width={26} height="100%" />
         </Pressable>
-        <Pressable style={styles.deleteButton} onPress={onDeleteButtonPress}>
+        <Pressable style={styles.button} onPress={onDeleteButtonPress}>
           <DeleteSvg width={26} height="100%" />
         </Pressable>
       </View>
@@ -64,8 +73,14 @@ function ChatPage({ navigation, route }: Props) {
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: chatName, headerRight: getHeaderRight });
-  });
+    navigation.setOptions({ headerRight: getHeaderRight });
+    dispatch(setCurrentChatName(chatName));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    navigation.setOptions({ title: currentChatName });
+  }, [navigation, currentChatName]);
 
   useEffect(() => {
     const data = chats?.find(chat => chat.id === chatId);
@@ -82,33 +97,45 @@ function ChatPage({ navigation, route }: Props) {
   }, [dispatch, status, errorMessage]);
 
   const onSendPress = () => {
-    setInputValue('');
-    dispatch(sendMessage({ chatId, message: inputValue }));
+    setMessageInputValue('');
+    dispatch(sendMessage({ chatId, message: messageInputValue }));
+  };
+
+  const onHeaderTitleChange = async (title: string) => {
+    dispatch(updateName({ chatId, name: title }));
   };
 
   return (
-    <View style={styles.container}>
-      {chatData && (
-        <FlatList
-          contentContainerStyle={styles.list}
-          inverted
-          data={[...chatData.messages].reverse()}
-          renderItem={({ item }) => <Message {...item} />}
-          ItemSeparatorComponent={ItemsSeparator}
-        />
-      )}
-      <View style={styles.footerContainer}>
-        <MyTextInput
-          style={styles.input}
-          placeholder="Type something..."
-          onChangeText={setInputValue}
-          value={inputValue}
-        />
-        <Pressable style={styles.sendButtonContainer} onPress={onSendPress}>
-          <SendSvg width={34} height={34} stroke={Colors.secondary} />
-        </Pressable>
+    <>
+      <TextInputModal
+        isVisible={isTextInputModalVisible}
+        setIsVisible={setIsTextInputModalVisible}
+        initialValue={chatName}
+        onConfirm={onHeaderTitleChange}
+      />
+      <View style={styles.container}>
+        {chatData && (
+          <FlatList
+            contentContainerStyle={styles.list}
+            inverted
+            data={[...chatData.messages].reverse()}
+            renderItem={({ item }) => <Message {...item} />}
+            ItemSeparatorComponent={ItemsSeparator}
+          />
+        )}
+        <View style={styles.footerContainer}>
+          <MyTextInput
+            style={styles.input}
+            placeholder="Type something..."
+            onChangeText={setMessageInputValue}
+            value={messageInputValue}
+          />
+          <Pressable style={styles.sendButtonContainer} onPress={onSendPress}>
+            <SendSvg width={34} height={34} stroke={Colors.secondary} />
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 

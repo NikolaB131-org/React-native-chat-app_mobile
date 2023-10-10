@@ -1,7 +1,7 @@
 import { Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
 import { connect, sendMessage } from '../websocket/reducer';
 import { AppDispatch, AppState } from '../redux/store';
-import { receiveMessage, set } from '../chats/reducer';
+import { receiveMessage, setChats } from '../chats/reducer';
 import { WSClientAllEvents, WSServerSendMessageEvent } from '../../../../backend/src/utils/websockets/types';
 
 export const websocketMiddleware: Middleware = (api: MiddlewareAPI<AppDispatch, AppState>) => {
@@ -31,7 +31,7 @@ export const websocketMiddleware: Middleware = (api: MiddlewareAPI<AppDispatch, 
 
           switch (data.event) {
             case 'all_chats': {
-              api.dispatch(set(data));
+              api.dispatch(setChats(data));
               break;
             }
             case 'receive_message': {
