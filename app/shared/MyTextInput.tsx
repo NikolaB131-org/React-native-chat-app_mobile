@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TextInput, TextInputProps } from 'react-native';
-import { Colors } from '../constants/colors';
+import { Colors } from '../core/constants/colors';
 
 type Props = {
   style?: TextInputProps['style'];

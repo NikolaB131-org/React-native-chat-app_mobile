@@ -5,7 +5,7 @@ import { MessageType } from '../../../backend/src/modules/message/message.model'
 import { useSelector } from 'react-redux';
 import { authUserIdSelector } from '../core/auth/selectors';
 import LinearGradient from 'react-native-linear-gradient';
-import { Colors } from '../constants/colors';
+import { Colors } from '../core/constants/colors';
 import { getMessageDate } from '../core/utils/getMessageDate';
 
 function Message({ message, sender, createdAt }: MessageType) {

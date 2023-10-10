@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextProps } from 'react-native';
-import { Colors } from '../constants/colors';
+import { Colors } from '../core/constants/colors';
 
 type Props = {
   style?: TextProps['style'];

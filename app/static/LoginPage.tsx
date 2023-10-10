@@ -9,7 +9,7 @@ import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import MyTextInput from '../shared/MyTextInput';
 import MyText from '../shared/MyText';
 import Spinner from '../shared/Spinner';
-import { Colors } from '../constants/colors';
+import { Colors } from '../core/constants/colors';
 
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 

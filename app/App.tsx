@@ -9,7 +9,7 @@ import SearchSvg from './assets/search.svg';
 import LoginPage from './static/LoginPage';
 import ChatsPage from './static/ChatsPage';
 import ChatPage from './static/ChatPage';
-import { Colors } from './constants/colors';
+import { Colors } from './core/constants/colors';
 
 export type RootStackParamList = {
   Login: undefined;

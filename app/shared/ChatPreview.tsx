@@ -4,7 +4,7 @@ import { GestureResponderEvent, Image, Pressable, StyleSheet, View } from 'react
 import ChatDefaultSvg from '../assets/chat_default.svg';
 import MyText from './MyText';
 import { getMessageDate } from '../core/utils/getMessageDate';
-import { Colors } from '../constants/colors';
+import { Colors } from '../core/constants/colors';
 
 const IMAGE_WIDTH = 55;
 const IMAGE_MARGIN_RIGHT = 16;

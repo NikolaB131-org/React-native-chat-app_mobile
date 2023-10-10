@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import ChatPreview, { getChatPreviewImageContainerWidth } from '../shared/ChatPreview';
-import { Colors } from '../constants/colors';
+import { Colors } from '../core/constants/colors';
 import { useSelector } from 'react-redux';
 import { chatsChatsSelector } from '../core/chats/selectors';
 import { useAppDispatch } from '../core/redux/hooks';
-import Config from 'react-native-config';
 import { authUserIdSelector } from '../core/auth/selectors';
-import websockets from '../core/websockets';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
-import { Sizes } from '../constants/sizes';
+import { Sizes } from '../core/constants/sizes';
+import { connect } from '../core/websocket/reducer';
+import Config from 'react-native-config';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
@@ -22,14 +22,8 @@ function ChatsPage({ navigation }: Props) {
   const userId = useSelector(authUserIdSelector);
 
   useEffect(() => {
-    console.log(chats);
-  }, [chats]);
-
-  useEffect(() => {
     if (userId && Config.API_URL_WS) {
-      console.log('RERENDER2');
-      const ws = new WebSocket(Config.API_URL_WS);
-      websockets.start(ws, dispatch, userId);
+      dispatch(connect(Config.API_URL_WS));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

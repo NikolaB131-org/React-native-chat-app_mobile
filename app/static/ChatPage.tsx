@@ -3,13 +3,15 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import MyTextInput from '../shared/MyTextInput';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
+import { useAppDispatch } from '../core/redux/hooks';
 import { useSelector } from 'react-redux';
 import { chatsChatsSelector } from '../core/chats/selectors';
-import Message from '../shared/Message';
-import { Colors } from '../constants/colors';
-import { Sizes } from '../constants/sizes';
-import SendSvg from '../assets/send.svg';
 import { ChatType } from '../../../backend/src/modules/chats/chats.model';
+import { sendMessage } from '../core/websocket/reducer';
+import Message from '../shared/Message';
+import SendSvg from '../assets/send.svg';
+import { Colors } from '../core/constants/colors';
+import { Sizes } from '../core/constants/sizes';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
@@ -18,8 +20,10 @@ type Props = StackScreenProps<RootStackParamList, 'Chat'>;
 function ChatPage({ route }: Props) {
   const { chatId } = route.params;
 
+  const dispatch = useAppDispatch();
   const chats = useSelector(chatsChatsSelector);
   const [chatData, setChatData] = useState<ChatType | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     const data = chats?.find(chat => chat.id === chatId);
@@ -27,6 +31,11 @@ function ChatPage({ route }: Props) {
       setChatData(data);
     }
   }, [chats, chatId, chatData]);
+
+  const onSendPress = () => {
+    setInputValue('');
+    dispatch(sendMessage({ chatId, message: inputValue }));
+  };
 
   return (
     <View style={styles.container}>
@@ -40,8 +49,13 @@ function ChatPage({ route }: Props) {
         />
       )}
       <View style={styles.footerContainer}>
-        <MyTextInput style={styles.input} placeholder="Type something..." />
-        <Pressable style={styles.sendButtonContainer}>
+        <MyTextInput
+          style={styles.input}
+          placeholder="Type something..."
+          onChangeText={setInputValue}
+          value={inputValue}
+        />
+        <Pressable style={styles.sendButtonContainer} onPress={onSendPress}>
           <SendSvg width={34} height={34} stroke={Colors.secondary} />
         </Pressable>
       </View>
