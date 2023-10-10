@@ -14,7 +14,7 @@ import Message from '../shared/Message';
 import SendSvg from '../assets/send.svg';
 import { Colors } from '../core/constants/colors';
 import { Sizes } from '../core/constants/sizes';
-import { deleteChat } from '../core/chats/thunks';
+import { deleteChat, leave } from '../core/chats/thunks';
 import { setStatus } from '../core/chats/reducer';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
@@ -36,6 +36,11 @@ function ChatPage({ navigation, route }: Props) {
     navigation.goBack();
   };
 
+  const onLeaveButtonPress = async () => {
+    await dispatch(leave(chatId));
+    navigation.goBack();
+  };
+
   const getHeaderRight = () => {
     const styles = StyleSheet.create({
       container: {
@@ -48,7 +53,7 @@ function ChatPage({ navigation, route }: Props) {
 
     return (
       <View style={styles.container}>
-        <Pressable style={styles.editButton}>
+        <Pressable style={styles.editButton} onPress={onLeaveButtonPress}>
           <LeaveSvg width={26} height="100%" />
         </Pressable>
         <Pressable style={styles.deleteButton} onPress={onDeleteButtonPress}>

@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
 import { WSClientAllChatsEvent, WSClientReceiveMessageEvent } from '../../../../backend/src/utils/websockets/types';
-import { deleteChat } from './thunks';
+import { deleteChat, leave } from './thunks';
 
 const initialState: InitiialState = {
   chats: [],
@@ -41,6 +41,24 @@ const slice = createSlice({
         state.status = 'idle';
       })
       .addCase(deleteChat.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
+        }
+      })
+      .addCase(leave.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(leave.fulfilled, (state, action) => {
+        const leavedChatId = action.payload;
+        if (state.chats) {
+          state.chats = state.chats.filter(chat => chat.id !== leavedChatId);
+        }
+        state.status = 'idle';
+      })
+      .addCase(leave.rejected, (state, action) => {
         state.status = 'failed';
         if (typeof action.payload === 'string') {
           state.errorMessage = action.payload;

@@ -26,3 +26,23 @@ export const deleteChat = createAsyncThunk<string, string>(
     }
   },
 );
+
+export const leave = createAsyncThunk<string, string>('chats/leave', async (payload, { getState, rejectWithValue }) => {
+  try {
+    const userId = authUserIdSelector(getState() as AppState) ?? '';
+    const response = await fetch(`${Config.API_URL_HTTP}/chats/leave/${payload}`, {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${userId}`,
+      },
+    });
+    if (!response.ok) {
+      return rejectWithValue((await response.json()).errMessage);
+    }
+    return payload;
+  } catch (error) {
+    return rejectWithValue(getMessageIfExists(error));
+  }
+});
