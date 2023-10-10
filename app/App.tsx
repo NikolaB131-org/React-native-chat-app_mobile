@@ -14,28 +14,38 @@ import { Colors } from './core/constants/colors';
 export type RootStackParamList = {
   Login: undefined;
   Chats: undefined;
-  Chat: { chatId: string };
+  Chat: { chatId: string; chatName: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-const getHeaderBackground = () => (
-  <>
-    <LinearGradient
-      style={styles.linearGradient}
-      colors={[Colors.primary, Colors.secondary]}
-      useAngle={true}
-      angle={30}
-    />
-    <StatusBar translucent={true} backgroundColor={'transparent'} barStyle={'light-content'} />
-  </>
-);
+function HeaderBackground() {
+  const styles = StyleSheet.create({ linearGradient: { flex: 1 } });
 
-const getSearchButton = () => (
-  <Pressable onPress={() => console.log(1233)} style={styles.searchButton}>
-    <SearchSvg width={22} height="100%" />
-  </Pressable>
-);
+  return (
+    <>
+      <LinearGradient
+        style={styles.linearGradient}
+        colors={[Colors.primary, Colors.secondary]}
+        useAngle={true}
+        angle={30}
+      />
+      <StatusBar translucent={true} backgroundColor={'transparent'} barStyle={'light-content'} />
+    </>
+  );
+}
+
+function ChatsPageRightButton() {
+  const styles = StyleSheet.create({
+    button: { paddingHorizontal: 20 },
+  });
+
+  return (
+    <Pressable onPress={() => console.log(1233)} style={styles.button}>
+      <SearchSvg width={22} height="100%" />
+    </Pressable>
+  );
+}
 
 function App() {
   return (
@@ -43,28 +53,18 @@ function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerBackground: getHeaderBackground,
+            headerBackground: HeaderBackground,
             headerTintColor: Colors.secondaryText,
             headerTitleAlign: 'center',
             cardStyle: { backgroundColor: '#FFF' },
           }}>
           <Stack.Screen name="Login" component={LoginPage} />
-          <Stack.Screen name="Chats" component={ChatsPage} options={{ headerRight: getSearchButton }} />
-          <Stack.Screen name="Chat" component={ChatPage} options={{ headerRight: undefined }} />
+          <Stack.Screen name="Chats" component={ChatsPage} options={{ headerRight: ChatsPageRightButton }} />
+          <Stack.Screen name="Chat" component={ChatPage} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  linearGradient: {
-    flex: 1,
-  },
-  searchButton: {
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-});
 
 export default App;

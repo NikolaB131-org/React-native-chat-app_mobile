@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
 import { WSClientAllChatsEvent, WSClientReceiveMessageEvent } from '../../../../backend/src/utils/websockets/types';
+import { deleteChat } from './thunks';
 
 const initialState: InitiialState = {
   chats: [],
@@ -12,10 +13,13 @@ const slice = createSlice({
   name: 'chats',
   initialState,
   reducers: {
-    setChats(state, action: PayloadAction<WSClientAllChatsEvent>) {
+    setStatus(state, action: PayloadAction<InitiialState['status']>) {
+      state.status = action.payload;
+    },
+    set(state, action: PayloadAction<WSClientAllChatsEvent>) {
       state.chats = action.payload.chats;
     },
-    addMessageToChat(state, action: PayloadAction<WSClientReceiveMessageEvent>) {
+    receiveMessage(state, action: PayloadAction<WSClientReceiveMessageEvent>) {
       const data = action.payload;
       if (state.chats) {
         const chatIndex = state.chats.findIndex(chat => chat.id === data.chatId);
@@ -24,8 +28,29 @@ const slice = createSlice({
       }
     },
   },
+  extraReducers: builder => {
+    builder
+      .addCase(deleteChat.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(deleteChat.fulfilled, (state, action) => {
+        const deletedChatId = action.payload;
+        if (state.chats) {
+          state.chats = state.chats.filter(chat => chat.id !== deletedChatId);
+        }
+        state.status = 'idle';
+      })
+      .addCase(deleteChat.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
+        }
+      });
+  },
 });
 
-export const { setChats, addMessageToChat } = slice.actions;
+export const { setStatus, set, receiveMessage } = slice.actions;
 
 export default slice.reducer;

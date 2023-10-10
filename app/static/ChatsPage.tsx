@@ -28,10 +28,6 @@ function ChatsPage({ navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onChatPreviewPress = (id: string) => {
-    navigation.push('Chat', { chatId: id });
-  };
-
   return (
     <FlatList
       contentContainerStyle={styles.container}
@@ -42,7 +38,7 @@ function ChatsPage({ navigation }: Props) {
           imageUrl={item.imageUrl}
           name={item.name}
           messages={item.messages}
-          onPress={() => onChatPreviewPress(item.id)}
+          onPress={() => navigation.push('Chat', { chatId: item.id, chatName: item.name })}
         />
       )}
     />

@@ -1,29 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import LeaveSvg from '../assets/leave.svg';
+import DeleteSvg from '../assets/delete.svg';
 import MyTextInput from '../shared/MyTextInput';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import { useAppDispatch } from '../core/redux/hooks';
 import { useSelector } from 'react-redux';
-import { chatsChatsSelector } from '../core/chats/selectors';
+import { chatsChatsSelector, chatsErrorMessageSelector, chatsStatusSelector } from '../core/chats/selectors';
 import { ChatType } from '../../../backend/src/modules/chats/chats.model';
 import { sendMessage } from '../core/websocket/reducer';
 import Message from '../shared/Message';
 import SendSvg from '../assets/send.svg';
 import { Colors } from '../core/constants/colors';
 import { Sizes } from '../core/constants/sizes';
+import { deleteChat } from '../core/chats/thunks';
+import { setStatus } from '../core/chats/reducer';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
 type Props = StackScreenProps<RootStackParamList, 'Chat'>;
 
-function ChatPage({ route }: Props) {
-  const { chatId } = route.params;
+function ChatPage({ navigation, route }: Props) {
+  const { chatId, chatName } = route.params;
 
   const dispatch = useAppDispatch();
   const chats = useSelector(chatsChatsSelector);
+  const status = useSelector(chatsStatusSelector);
+  const errorMessage = useSelector(chatsErrorMessageSelector);
   const [chatData, setChatData] = useState<ChatType | null>(null);
   const [inputValue, setInputValue] = useState('');
+
+  const onDeleteButtonPress = async () => {
+    await dispatch(deleteChat(chatId));
+    navigation.goBack();
+  };
+
+  const getHeaderRight = () => {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'row',
+        paddingRight: 4,
+      },
+      editButton: { paddingHorizontal: 12 },
+      deleteButton: { paddingHorizontal: 12 },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Pressable style={styles.editButton}>
+          <LeaveSvg width={26} height="100%" />
+        </Pressable>
+        <Pressable style={styles.deleteButton} onPress={onDeleteButtonPress}>
+          <DeleteSvg width={26} height="100%" />
+        </Pressable>
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    navigation.setOptions({ title: chatName, headerRight: getHeaderRight });
+  });
 
   useEffect(() => {
     const data = chats?.find(chat => chat.id === chatId);
@@ -31,6 +68,13 @@ function ChatPage({ route }: Props) {
       setChatData(data);
     }
   }, [chats, chatId, chatData]);
+
+  useEffect(() => {
+    if (status === 'failed') {
+      Alert.alert('Error', errorMessage);
+      dispatch(setStatus('idle'));
+    }
+  }, [dispatch, status, errorMessage]);
 
   const onSendPress = () => {
     setInputValue('');
