@@ -7,6 +7,29 @@ import { UpdateNamePayload } from './types';
 import { ChatsSearchResponse } from '../../../../backend/src/modules/chats/chats.service';
 import { ChatType } from '../../../../backend/src/modules/chats/chats.model';
 
+export const create = createAsyncThunk<ChatType, string, { state: AppState }>(
+  'chats/create',
+  async (payload, { getState, rejectWithValue }) => {
+    try {
+      const userId = authUserIdSelector(getState()) ?? '';
+      const response = await fetch(`${Config.API_URL_HTTP}/chats/?name=${payload}`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${userId}`,
+        },
+      });
+      if (!response.ok) {
+        return rejectWithValue((await response.json()).errMessage);
+      }
+      return await response.json();
+    } catch (error) {
+      return rejectWithValue(getMessageIfExists(error));
+    }
+  },
+);
+
 export const updateName = createAsyncThunk<UpdateNamePayload, UpdateNamePayload, { state: AppState }>(
   'chats/updateName',
   async (payload, { getState, rejectWithValue }) => {

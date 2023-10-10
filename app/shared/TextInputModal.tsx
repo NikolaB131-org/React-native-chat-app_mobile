@@ -8,18 +8,21 @@ const BORDER_RADIUS = 12;
 const BACKGROUND_COLOR = 'rgba(0, 0, 0, 0.3)';
 
 type Props = {
+  titleText?: string;
+  initialValue?: string;
+  placeholder?: string;
   isVisible: boolean;
   setIsVisible: (value: boolean) => void;
-  initialValue: string;
   onConfirm: (value: string) => void;
 };
 
-function TextInputModal({ isVisible, setIsVisible, initialValue, onConfirm }: Props) {
+function TextInputModal({ titleText, initialValue = '', placeholder, isVisible, setIsVisible, onConfirm }: Props) {
   const [inputValue, setInputValue] = useState(initialValue);
 
   const onConfirmPressed = () => {
     onConfirm(inputValue);
     setIsVisible(false);
+    setInputValue(initialValue);
   };
 
   return (
@@ -27,7 +30,14 @@ function TextInputModal({ isVisible, setIsVisible, initialValue, onConfirm }: Pr
       <StatusBar backgroundColor={BACKGROUND_COLOR} />
       <Pressable style={styles.wrapper} onPress={() => setIsVisible(false)}>
         <Pressable style={styles.container}>
-          <MyTextInput style={styles.textInput} value={inputValue} onChangeText={setInputValue} autoFocus />
+          {titleText && <MyText style={styles.titleText}>{titleText}</MyText>}
+          <MyTextInput
+            style={styles.textInput}
+            value={inputValue}
+            onChangeText={setInputValue}
+            autoFocus
+            placeholder={placeholder}
+          />
           <Pressable style={styles.button} onPress={onConfirmPressed}>
             <MyText style={styles.buttonText}>Confirm</MyText>
           </Pressable>
@@ -50,13 +60,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.lightGrey,
     borderRadius: 15,
     padding: 20,
-    justifyContent: 'space-between',
     backgroundColor: '#FFF',
+    gap: 15,
+  },
+  titleText: {
+    fontSize: 20,
+    textAlign: 'center',
   },
   textInput: {
     height: 50,
     paddingHorizontal: 15,
-    marginBottom: 15,
     borderRadius: BORDER_RADIUS,
     borderColor: Colors.primary,
     borderWidth: 2,

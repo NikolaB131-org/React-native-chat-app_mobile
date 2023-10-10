@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
 import ChatPreview, { ItemsSeparator } from '../shared/ChatPreview';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -9,10 +9,13 @@ import { useAppDispatch } from '../core/redux/hooks';
 import { authUserIdSelector } from '../core/auth/selectors';
 import LeaveSvg from '../assets/leave.svg';
 import SearchSvg from '../assets/search.svg';
+import PlusInCircleSvg from '../assets/plus_in_circle.svg';
 import { logout } from '../core/auth/thunks';
 import { connect } from '../core/websocket/reducer';
 import Config from 'react-native-config';
 import { Sizes } from '../core/constants/sizes';
+import TextInputModal from '../shared/TextInputModal';
+import { create } from '../core/chats/thunks';
 
 type Props = StackScreenProps<RootStackParamList, 'Chats'>;
 
@@ -20,6 +23,8 @@ function ChatsPage({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const chats = useSelector(chatsChatsSelector);
   const userId = useSelector(authUserIdSelector);
+
+  const [isAddChatModalVisible, setIsAddChatModalVisible] = useState(false);
 
   const getHeaderLeft = () => {
     const styles = StyleSheet.create({
@@ -54,24 +59,46 @@ function ChatsPage({ navigation }: Props) {
   }, []);
 
   return (
-    <FlatList
-      contentContainerStyle={styles.container}
-      data={chats}
-      ItemSeparatorComponent={ItemsSeparator}
-      renderItem={({ item }) => (
-        <ChatPreview
-          imageUrl={item.imageUrl}
-          name={item.name}
-          messages={item.messages}
-          onPress={() => navigation.push('Chat', { chatId: item.id, chatName: item.name })}
-        />
-      )}
-    />
+    <>
+      <FlatList
+        contentContainerStyle={styles.container}
+        data={chats}
+        ItemSeparatorComponent={ItemsSeparator}
+        renderItem={({ item }) => (
+          <ChatPreview
+            imageUrl={item.imageUrl}
+            name={item.name}
+            messages={item.messages}
+            onPress={() => navigation.push('Chat', { chatId: item.id, chatName: item.name })}
+          />
+        )}
+      />
+      <TextInputModal
+        titleText="Enter the chat name"
+        placeholder="Lorem ipsum :)"
+        isVisible={isAddChatModalVisible}
+        setIsVisible={setIsAddChatModalVisible}
+        onConfirm={value => dispatch(create(value))}
+      />
+      <PlusInCircleSvg
+        style={styles.plusButton}
+        width={62}
+        height={62}
+        onPress={() => setIsAddChatModalVisible(true)}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: Sizes.paddingHorizontal },
+  container: {
+    padding: Sizes.paddingHorizontal,
+  },
+  plusButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
 });
 
 export default ChatsPage;

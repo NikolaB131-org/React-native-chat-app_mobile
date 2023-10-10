@@ -1,7 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
 import { WSClientAllChatsEvent, WSClientReceiveMessageEvent } from '../../../../backend/src/utils/websockets/types';
-import { deleteChat, join, leave, search, updateName } from './thunks';
+import { create, deleteChat, join, leave, search, updateName } from './thunks';
+import { logout } from '../auth/thunks';
 
 const initialState: InitiialState = {
   chats: [],
@@ -23,11 +24,9 @@ const slice = createSlice({
     },
     receiveMessage(state, action: PayloadAction<WSClientReceiveMessageEvent>) {
       const data = action.payload;
-      if (state.chats) {
-        const chatIndex = state.chats.findIndex(chat => chat.id === data.chatId);
-        const { id, message, sender, createdAt } = data;
-        state.chats[chatIndex].messages = [...state.chats[chatIndex].messages, { id, message, sender, createdAt }];
-      }
+      const chatIndex = state.chats.findIndex(chat => chat.id === data.chatId);
+      const { id, message, sender, createdAt } = data;
+      state.chats[chatIndex].messages = [...state.chats[chatIndex].messages, { id, message, sender, createdAt }];
     },
     setCurrentChatName(state, action: PayloadAction<InitiialState['currentChatName']>) {
       state.currentChatName = action.payload;
@@ -35,52 +34,20 @@ const slice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(deleteChat.pending, state => {
+      .addCase(logout.fulfilled.type, state => {
+        state.chats = [];
+        state.errorMessage = '';
+        state.currentChatName = '';
+        state.searchedChats = [];
+      })
+      .addCase(create.pending, state => {
         state.status = 'loading';
       })
-      .addCase(deleteChat.fulfilled, (state, action) => {
-        const deletedChatId = action.payload;
-        if (state.chats) {
-          state.chats = state.chats.filter(chat => chat.id !== deletedChatId);
-        }
+      .addCase(create.fulfilled, (state, action) => {
+        state.chats = [...state.chats, action.payload];
         state.status = 'idle';
       })
-      .addCase(deleteChat.rejected, (state, action) => {
-        state.status = 'failed';
-        if (typeof action.payload === 'string') {
-          state.errorMessage = action.payload;
-        } else {
-          state.errorMessage = 'An error occurred while deleting chat';
-        }
-      })
-      .addCase(join.pending, state => {
-        state.status = 'loading';
-      })
-      .addCase(join.fulfilled, (state, action) => {
-        if (state.chats) {
-          state.chats = [...state.chats, action.payload];
-        }
-        state.status = 'idle';
-      })
-      .addCase(join.rejected, (state, action) => {
-        state.status = 'failed';
-        if (typeof action.payload === 'string') {
-          state.errorMessage = action.payload;
-        } else {
-          state.errorMessage = 'An error occurred while deleting chat';
-        }
-      })
-      .addCase(leave.pending, state => {
-        state.status = 'loading';
-      })
-      .addCase(leave.fulfilled, (state, action) => {
-        const leavedChatId = action.payload;
-        if (state.chats) {
-          state.chats = state.chats.filter(chat => chat.id !== leavedChatId);
-        }
-        state.status = 'idle';
-      })
-      .addCase(leave.rejected, (state, action) => {
+      .addCase(create.rejected, (state, action) => {
         state.status = 'failed';
         if (typeof action.payload === 'string') {
           state.errorMessage = action.payload;
@@ -93,13 +60,27 @@ const slice = createSlice({
       })
       .addCase(updateName.fulfilled, (state, action) => {
         const { chatId, name } = action.payload;
-        if (state.chats) {
-          state.chats = state.chats.map(chat => (chat.id === chatId ? { ...chat, name } : chat));
-          state.currentChatName = name;
-        }
+        state.chats = state.chats.map(chat => (chat.id === chatId ? { ...chat, name } : chat));
+        state.currentChatName = name;
         state.status = 'idle';
       })
       .addCase(updateName.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
+        }
+      })
+      .addCase(deleteChat.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(deleteChat.fulfilled, (state, action) => {
+        const deletedChatId = action.payload;
+        state.chats = state.chats.filter(chat => chat.id !== deletedChatId);
+        state.status = 'idle';
+      })
+      .addCase(deleteChat.rejected, (state, action) => {
         state.status = 'failed';
         if (typeof action.payload === 'string') {
           state.errorMessage = action.payload;
@@ -120,6 +101,37 @@ const slice = createSlice({
           state.errorMessage = action.payload;
         } else {
           state.errorMessage = 'An error occurred while searching for chats';
+        }
+      })
+      .addCase(join.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(join.fulfilled, (state, action) => {
+        state.chats = [...state.chats, action.payload];
+        state.status = 'idle';
+      })
+      .addCase(join.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
+        }
+      })
+      .addCase(leave.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(leave.fulfilled, (state, action) => {
+        const leavedChatId = action.payload;
+        state.chats = state.chats.filter(chat => chat.id !== leavedChatId);
+        state.status = 'idle';
+      })
+      .addCase(leave.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while deleting chat';
         }
       });
   },

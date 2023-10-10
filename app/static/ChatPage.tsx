@@ -79,7 +79,7 @@ function ChatPage({ navigation, route }: Props) {
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({ title: currentChatName });
+    navigation.setOptions({ title: currentChatName }); // for updating header title
   }, [navigation, currentChatName]);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ function ChatPage({ navigation, route }: Props) {
           <FlatList
             contentContainerStyle={styles.list}
             inverted
-            data={[...chatData.messages].reverse()}
+            data={[...chatData.messages].reverse()} // we need to reverse data because of prop inverted
             renderItem={({ item }) => <Message {...item} />}
             ItemSeparatorComponent={ItemsSeparator}
           />

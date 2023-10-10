@@ -41,6 +41,7 @@ const slice = createSlice({
       .addCase(logout.fulfilled, state => {
         state.status = 'idle';
         state.userId = null;
+        state.errorMessage = '';
       })
       .addCase(logout.rejected, (state, action) => {
         state.status = 'failed';

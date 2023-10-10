@@ -3,7 +3,7 @@ import { WSClientAllChatsEvent } from '../../../../backend/src/utils/websockets/
 import { FetchStatus } from '../redux/types';
 
 export type InitiialState = {
-  chats: WSClientAllChatsEvent['chats'] | null;
+  chats: WSClientAllChatsEvent['chats'];
   status: FetchStatus;
   errorMessage: string;
   currentChatName: string;

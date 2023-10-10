@@ -18,7 +18,7 @@ function MyText({ style, placeholder, onChangeText, value, onEndEditing, autoFoc
     if (autoFocus) {
       setTimeout(() => {
         ref.current?.focus();
-      }, 100);
+      }, 150);
     }
   }, [ref, autoFocus]);
 
