@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import ChatPreview, { getChatPreviewImageContainerWidth } from '../shared/ChatPreview';
-import { Colors } from '../core/constants/colors';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../App';
 import { useSelector } from 'react-redux';
 import { chatsChatsSelector } from '../core/chats/selectors';
 import { useAppDispatch } from '../core/redux/hooks';
 import { authUserIdSelector } from '../core/auth/selectors';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../App';
-import { Sizes } from '../core/constants/sizes';
+import LeaveSvg from '../assets/leave.svg';
+import SearchSvg from '../assets/search.svg';
+import { logout } from '../core/auth/thunks';
 import { connect } from '../core/websocket/reducer';
 import Config from 'react-native-config';
+import { Sizes } from '../core/constants/sizes';
+import { Colors } from '../core/constants/colors';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
@@ -21,7 +24,32 @@ function ChatsPage({ navigation }: Props) {
   const chats = useSelector(chatsChatsSelector);
   const userId = useSelector(authUserIdSelector);
 
+  const getHeaderLeft = () => {
+    const styles = StyleSheet.create({
+      button: { paddingHorizontal: 20 },
+    });
+
+    return (
+      <Pressable onPress={() => dispatch(logout())} style={styles.button}>
+        <LeaveSvg width={26} height="100%" transform={[{ rotateY: '180deg' }]} />
+      </Pressable>
+    );
+  };
+
+  const getHeaderRight = () => {
+    const styles = StyleSheet.create({
+      button: { paddingHorizontal: 20 },
+    });
+
+    return (
+      <Pressable onPress={() => console.log(1233)} style={styles.button}>
+        <SearchSvg width={22} height="100%" />
+      </Pressable>
+    );
+  };
+
   useEffect(() => {
+    navigation.setOptions({ headerLeft: getHeaderLeft, headerRight: getHeaderRight });
     if (userId && Config.API_URL_WS) {
       dispatch(connect(Config.API_URL_WS));
     }

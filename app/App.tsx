@@ -1,15 +1,18 @@
-import React from 'react';
-import { Provider } from 'react-redux';
+import React, { useEffect } from 'react';
+import { Provider, useSelector } from 'react-redux';
 import { store } from './core/redux/store';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
-import { Pressable, StatusBar, StyleSheet } from 'react-native';
-import SearchSvg from './assets/search.svg';
+import { StatusBar, StyleSheet } from 'react-native';
 import LoginPage from './static/LoginPage';
 import ChatsPage from './static/ChatsPage';
 import ChatPage from './static/ChatPage';
 import { Colors } from './core/constants/colors';
+import Keychain from 'react-native-keychain';
+import { useAppDispatch } from './core/redux/hooks';
+import { setUserId } from './core/auth/reducer';
+import { authUserIdSelector } from './core/auth/selectors';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -35,36 +38,54 @@ function HeaderBackground() {
   );
 }
 
-function ChatsPageRightButton() {
-  const styles = StyleSheet.create({
-    button: { paddingHorizontal: 20 },
-  });
+function App() {
+  const dispatch = useAppDispatch();
+  const userId = useSelector(authUserIdSelector);
+
+  useEffect(() => {
+    const getCredentials = async () => {
+      const credentials = await Keychain.getGenericPassword();
+      if (credentials && credentials.username) {
+        dispatch(setUserId(credentials.username));
+        console.log('Credentials successfully restored');
+      }
+    };
+    getCredentials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Pressable onPress={() => console.log(1233)} style={styles.button}>
-      <SearchSvg width={22} height="100%" />
-    </Pressable>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerBackground: HeaderBackground,
+          headerTintColor: Colors.secondaryText,
+          headerTitleAlign: 'center',
+          cardStyle: { backgroundColor: '#FFF' },
+        }}>
+        {userId ? (
+          <>
+            <Stack.Screen name="Chats" component={ChatsPage} />
+            <Stack.Screen name="Chat" component={ChatPage} />
+          </>
+        ) : (
+          <Stack.Screen
+            name="Login"
+            component={LoginPage}
+            options={{ animationTypeForReplace: userId ? 'push' : 'pop' }}
+          />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-function App() {
+function AppWrapper() {
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerBackground: HeaderBackground,
-            headerTintColor: Colors.secondaryText,
-            headerTitleAlign: 'center',
-            cardStyle: { backgroundColor: '#FFF' },
-          }}>
-          <Stack.Screen name="Login" component={LoginPage} />
-          <Stack.Screen name="Chats" component={ChatsPage} options={{ headerRight: ChatsPageRightButton }} />
-          <Stack.Screen name="Chat" component={ChatPage} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <App />
     </Provider>
   );
 }
 
-export default App;
+export default AppWrapper;

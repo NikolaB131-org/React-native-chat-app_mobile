@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../App';
 import { useAppDispatch } from '../core/redux/hooks';
 import { useSelector } from 'react-redux';
-import { authUserIdSelector, authStatusSelector, authErrorMessageSelector } from '../core/auth/selectors';
+import { authStatusSelector, authErrorMessageSelector } from '../core/auth/selectors';
 import { login } from '../core/auth/thunks';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import MyTextInput from '../shared/MyTextInput';
@@ -11,11 +9,8 @@ import MyText from '../shared/MyText';
 import Spinner from '../shared/Spinner';
 import { Colors } from '../core/constants/colors';
 
-type Props = StackScreenProps<RootStackParamList, 'Login'>;
-
-function LoginPage({ navigation }: Props) {
+function LoginPage() {
   const dispatch = useAppDispatch();
-  const authUserId = useSelector(authUserIdSelector);
   const authStatus = useSelector(authStatusSelector);
   const authErrorMessage = useSelector(authErrorMessageSelector);
 
@@ -30,22 +25,10 @@ function LoginPage({ navigation }: Props) {
   };
 
   useEffect(() => {
-    switch (authStatus) {
-      case 'idle': {
-        if (authUserId) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Chats' }],
-          });
-        }
-        break;
-      }
-      case 'failed': {
-        Alert.alert('Error', authErrorMessage);
-        break;
-      }
+    if (authStatus === 'failed') {
+      Alert.alert('Error', authErrorMessage);
     }
-  }, [navigation, authUserId, authStatus, authErrorMessage]);
+  }, [authStatus, authErrorMessage]);
 
   return (
     <>

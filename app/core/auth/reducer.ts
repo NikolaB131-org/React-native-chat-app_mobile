@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
-import { login } from './thunks';
+import { login, logout } from './thunks';
 
 const initialState: InitiialState = {
   userId: null,
@@ -11,7 +11,11 @@ const initialState: InitiialState = {
 const slice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    setUserId(state, action: PayloadAction<string>) {
+      state.userId = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(login.pending, state => {
@@ -30,8 +34,25 @@ const slice = createSlice({
         } else {
           state.errorMessage = 'An error occurred while logging in';
         }
+      })
+      .addCase(logout.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(logout.fulfilled, state => {
+        state.status = 'idle';
+        state.userId = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.status = 'failed';
+        if (typeof action.payload === 'string') {
+          state.errorMessage = action.payload;
+        } else {
+          state.errorMessage = 'An error occurred while logging in';
+        }
       });
   },
 });
+
+export const { setUserId } = slice.actions;
 
 export default slice.reducer;

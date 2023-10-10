@@ -3,6 +3,7 @@ import { connect, sendMessage } from '../websocket/reducer';
 import { AppDispatch, AppState } from '../redux/store';
 import { receiveMessage, setChats } from '../chats/reducer';
 import { WSClientAllEvents, WSServerSendMessageEvent } from '../../../../backend/src/utils/websockets/types';
+import { logout } from '../auth/thunks';
 
 export const websocketMiddleware: Middleware = (api: MiddlewareAPI<AppDispatch, AppState>) => {
   let ws: WebSocket | null = null;
@@ -23,7 +24,7 @@ export const websocketMiddleware: Middleware = (api: MiddlewareAPI<AppDispatch, 
         };
 
         ws.onclose = e => {
-          console.log('websocket closed:', e.reason);
+          console.log('websocket closed, reason:', e.reason);
         };
 
         ws.onmessage = message => {
@@ -42,6 +43,15 @@ export const websocketMiddleware: Middleware = (api: MiddlewareAPI<AppDispatch, 
         };
         break;
       }
+
+      case logout.fulfilled.type: {
+        if (ws) {
+          ws.close(1000, 'logout');
+          ws = null;
+        }
+        break;
+      }
+
       case sendMessage.type: {
         if (!ws) {
           return next(action);

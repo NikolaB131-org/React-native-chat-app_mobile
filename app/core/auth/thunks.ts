@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { LoginPayload } from './types';
 import Config from 'react-native-config';
 import { getMessageIfExists } from '../redux/utils/getMessageIfExists';
+import Keychain from 'react-native-keychain';
 
 export const login = createAsyncThunk<string | void, LoginPayload>(
   'auth/login',
@@ -19,9 +20,21 @@ export const login = createAsyncThunk<string | void, LoginPayload>(
       if (!response.ok) {
         return rejectWithValue((await response.json()).errMessage);
       }
-      return (await response.json()).userId;
+      const userId = (await response.json()).userId;
+      await Keychain.setGenericPassword(userId, '1');
+      console.log('Credentials saved');
+      return userId;
     } catch (error) {
       return rejectWithValue(getMessageIfExists(error));
     }
   },
 );
+
+export const logout = createAsyncThunk<void, void>('auth/logout', async (_, { rejectWithValue }) => {
+  try {
+    await Keychain.resetGenericPassword();
+    console.log('Credentials deleted');
+  } catch (error) {
+    return rejectWithValue(getMessageIfExists(error));
+  }
+});
