@@ -1,9 +1,9 @@
 import React from 'react';
 import { MessageType } from '../../../backend/src/modules/message/message.model';
-import { prependZero } from '../core/utils/prependZero';
 import { GestureResponderEvent, Image, Pressable, StyleSheet, View } from 'react-native';
 import ChatDefaultSvg from '../assets/chat_default.svg';
 import MyText from './MyText';
+import { getMessageDate } from '../core/utils/getMessageDate';
 import { Colors } from '../constants/colors';
 
 const IMAGE_WIDTH = 55;
@@ -22,29 +22,6 @@ function ChatPreview({ imageUrl, name, messages, onPress }: Props) {
   const lastMessage = messages.at(-1);
   const lastMessageText: string = lastMessage?.message ?? '';
 
-  const getLastMessageDate = (): string => {
-    if (!lastMessage) {
-      return '';
-    }
-
-    const date = new Date(lastMessage.createdAt);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hours = date.getHours();
-    const miniutes = date.getMinutes();
-
-    const dateNow = new Date();
-    const yearNow = dateNow.getFullYear();
-    const monthNow = dateNow.getMonth() + 1;
-    const dayNow = dateNow.getDate();
-
-    if (year === yearNow && month === monthNow && day === dayNow) {
-      return `${prependZero(hours)}:${prependZero(miniutes)}`;
-    }
-    return `${prependZero(day)}/${prependZero(month)}/${year}`;
-  };
-
   return (
     <Pressable style={styles.container} onPress={onPress}>
       {imageUrl ? (
@@ -59,7 +36,7 @@ function ChatPreview({ imageUrl, name, messages, onPress }: Props) {
             {lastMessageText}
           </MyText>
         </View>
-        <MyText style={styles.date}>{getLastMessageDate()}</MyText>
+        <MyText style={styles.date}>{lastMessage ? getMessageDate(new Date(lastMessage.createdAt)) : ''}</MyText>
       </View>
     </Pressable>
   );

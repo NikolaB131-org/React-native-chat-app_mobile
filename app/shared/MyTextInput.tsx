@@ -12,7 +12,7 @@ type Props = {
 function MyText({ style, placeholder, onChangeText, value }: Props) {
   return (
     <TextInput
-      style={[styles.text, style]}
+      style={[styles.input, style]}
       placeholderTextColor={Colors.lightGrey}
       selectionColor={Colors.primary}
       placeholder={placeholder}
@@ -23,8 +23,9 @@ function MyText({ style, placeholder, onChangeText, value }: Props) {
 }
 
 const styles = StyleSheet.create({
-  text: {
+  input: {
     color: Colors.primaryText,
+    padding: 0,
   },
 });
 

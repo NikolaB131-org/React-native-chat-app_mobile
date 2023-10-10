@@ -6,11 +6,12 @@ type Props = {
   style?: TextProps['style'];
   children?: TextProps['children'];
   numberOfLines?: TextProps['numberOfLines'];
+  selectable?: TextProps['selectable'];
 };
 
-function MyText({ style, children, numberOfLines }: Props) {
+function MyText({ style, children, numberOfLines, selectable }: Props) {
   return (
-    <Text style={[styles.text, style]} numberOfLines={numberOfLines}>
+    <Text style={[styles.text, style]} numberOfLines={numberOfLines} selectable={selectable}>
       {children}
     </Text>
   );

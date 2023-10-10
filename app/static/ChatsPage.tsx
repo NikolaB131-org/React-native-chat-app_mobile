@@ -8,13 +8,22 @@ import { useAppDispatch } from '../core/redux/hooks';
 import Config from 'react-native-config';
 import { authUserIdSelector } from '../core/auth/selectors';
 import websockets from '../core/websockets';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../App';
+import { Sizes } from '../constants/sizes';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 
-function ChatsPage() {
+type Props = StackScreenProps<RootStackParamList, 'Chats'>;
+
+function ChatsPage({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const chats = useSelector(chatsChatsSelector);
   const userId = useSelector(authUserIdSelector);
+
+  useEffect(() => {
+    console.log(chats);
+  }, [chats]);
 
   useEffect(() => {
     if (userId && Config.API_URL_WS) {
@@ -26,7 +35,7 @@ function ChatsPage() {
   }, []);
 
   const onChatPreviewPress = (id: string) => {
-    console.log(id);
+    navigation.push('Chat', { chatId: id });
   };
 
   return (
@@ -48,7 +57,7 @@ function ChatsPage() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 12,
+    padding: Sizes.paddingHorizontal,
   },
   itemsSeparator: {
     height: 1,

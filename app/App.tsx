@@ -5,14 +5,16 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Pressable, StatusBar, StyleSheet } from 'react-native';
-import ChatsPage from './static/ChatsPage';
 import SearchSvg from './assets/search.svg';
 import LoginPage from './static/LoginPage';
+import ChatsPage from './static/ChatsPage';
+import ChatPage from './static/ChatPage';
 import { Colors } from './constants/colors';
 
 export type RootStackParamList = {
   Login: undefined;
   Chats: undefined;
+  Chat: { chatId: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -48,6 +50,7 @@ function App() {
           }}>
           <Stack.Screen name="Login" component={LoginPage} />
           <Stack.Screen name="Chats" component={ChatsPage} options={{ headerRight: getSearchButton }} />
+          <Stack.Screen name="Chat" component={ChatPage} options={{ headerRight: undefined }} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
