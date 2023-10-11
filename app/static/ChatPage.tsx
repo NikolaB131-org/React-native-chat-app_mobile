@@ -14,8 +14,8 @@ import {
   chatsErrorMessageSelector,
   chatsStatusSelector,
 } from '../core/chats/selectors';
-import { ChatType } from '../../../backend/src/modules/chats/chats.model';
-import { sendMessage } from '../core/websocket/reducer';
+import { ChatType } from '../core/chats/types';
+import { sendMessage } from '../core/websockets/reducer';
 import Message from '../shared/Message';
 import SendSvg from '../assets/send.svg';
 import { Colors } from '../core/constants/colors';

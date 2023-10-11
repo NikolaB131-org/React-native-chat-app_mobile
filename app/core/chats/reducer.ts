@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
-import { WSClientAllChatsEvent, WSClientReceiveMessageEvent } from '../../../../backend/src/utils/websockets/types';
+import { WSAllChatsEvent, WSReceiveMessageEvent } from '../websockets/websocketsMiddleware';
 import { create, deleteChat, join, leave, search, updateName } from './thunks';
 import { logout } from '../auth/thunks';
 
@@ -19,10 +19,10 @@ const slice = createSlice({
     setStatus(state, action: PayloadAction<InitiialState['status']>) {
       state.status = action.payload;
     },
-    setChats(state, action: PayloadAction<WSClientAllChatsEvent>) {
+    setChats(state, action: PayloadAction<WSAllChatsEvent>) {
       state.chats = action.payload.chats;
     },
-    receiveMessage(state, action: PayloadAction<WSClientReceiveMessageEvent>) {
+    receiveMessage(state, action: PayloadAction<WSReceiveMessageEvent>) {
       const data = action.payload;
       const chatIndex = state.chats.findIndex(chat => chat.id === data.chatId);
       const { id, message, sender, createdAt } = data;

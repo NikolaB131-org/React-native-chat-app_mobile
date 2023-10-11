@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import MyText from './MyText';
-import { MessageType } from '../../../backend/src/modules/message/message.model';
+import { MessageType } from '../core/chats/types';
 import { useSelector } from 'react-redux';
 import { authUserIdSelector } from '../core/auth/selectors';
 import LinearGradient from 'react-native-linear-gradient';

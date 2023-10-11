@@ -1,16 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../auth/reducer';
 import chatsReducer from '../chats/reducer';
-import websocketReducer from '../websocket/reducer';
-import { websocketMiddleware } from '../middlewares/websocketMiddleware';
+import websocketsReducer from '../websockets/reducer';
+import { websocketsMiddleware } from '../websockets/websocketsMiddleware';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     chats: chatsReducer,
-    websocket: websocketReducer,
+    websockets: websocketsReducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(websocketMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(websocketsMiddleware),
 });
 
 export type AppState = ReturnType<typeof store.getState>;

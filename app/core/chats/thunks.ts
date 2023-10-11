@@ -3,9 +3,7 @@ import Config from 'react-native-config';
 import { getMessageIfExists } from '../redux/utils/getMessageIfExists';
 import { authUserIdSelector } from '../auth/selectors';
 import { AppState } from '../redux/store';
-import { UpdateNamePayload } from './types';
-import { ChatsSearchResponse } from '../../../../backend/src/modules/chats/chats.service';
-import { ChatType } from '../../../../backend/src/modules/chats/chats.model';
+import { ChatType, UpdateNamePayload } from './types';
 
 export const create = createAsyncThunk<ChatType, string, { state: AppState }>(
   'chats/create',
@@ -76,7 +74,7 @@ export const deleteChat = createAsyncThunk<string, string, { state: AppState }>(
   },
 );
 
-export const search = createAsyncThunk<ChatsSearchResponse, string, { state: AppState }>(
+export const search = createAsyncThunk<ChatType[], string, { state: AppState }>(
   'chats/search',
   async (payload, { getState, rejectWithValue }) => {
     try {

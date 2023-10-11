@@ -11,7 +11,7 @@ import LeaveSvg from '../assets/leave.svg';
 import SearchSvg from '../assets/search.svg';
 import PlusInCircleSvg from '../assets/plus_in_circle.svg';
 import { logout } from '../core/auth/thunks';
-import { connect } from '../core/websocket/reducer';
+import { connect } from '../core/websockets/reducer';
 import Config from 'react-native-config';
 import { Sizes } from '../core/constants/sizes';
 import TextInputModal from '../shared/TextInputModal';

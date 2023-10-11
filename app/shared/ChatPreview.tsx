@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageType } from '../../../backend/src/modules/message/message.model';
+import { MessageType } from '../core/chats/types';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import ChatDefaultSvg from '../assets/chat_default.svg';
 import PlusSvg from '../assets/plus.svg';
