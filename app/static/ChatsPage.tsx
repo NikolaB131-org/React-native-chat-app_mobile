@@ -66,10 +66,6 @@ function ChatsPage({ navigation }: Props) {
     dispatch(setCurrentChatName(name));
   };
 
-  useEffect(() => {
-    console.log(status);
-  }, [status]);
-
   return (
     <>
       {status === 'loading' ? (
