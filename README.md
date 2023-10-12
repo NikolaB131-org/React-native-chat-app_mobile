@@ -22,6 +22,8 @@
 
 ## How to run
 
+> We have builded .apk [here](https://github.com/NikolaB131-org/React-native-chat-app_mobile/releases/latest)
+
 1. Make sure you have done setup steps from [react native docs](https://reactnative.dev/docs/environment-setup)
 
 2. Install dependencies
