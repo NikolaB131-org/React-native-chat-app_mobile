@@ -3,6 +3,7 @@ import { InitiialState } from './types';
 import { WSAllChatsEvent, WSReceiveMessageEvent } from '../websockets/types';
 import { create, deleteChat, join, leave, search, updateName } from './thunks';
 import { logout } from '../auth/thunks';
+import { connect } from '../websockets/reducer';
 
 const initialState: InitiialState = {
   chats: [],
@@ -21,6 +22,7 @@ const slice = createSlice({
     },
     setChats(state, action: PayloadAction<WSAllChatsEvent>) {
       state.chats = action.payload.chats;
+      state.status = 'idle'; // websockets answered, no need to show loading
     },
     receiveMessage(state, action: PayloadAction<WSReceiveMessageEvent>) {
       const data = action.payload;
@@ -103,12 +105,8 @@ const slice = createSlice({
           state.errorMessage = 'An error occurred while searching for chats';
         }
       })
-      .addCase(join.pending, state => {
-        state.status = 'loading';
-      })
       .addCase(join.fulfilled, (state, action) => {
         state.chats = [...state.chats, action.payload];
-        state.status = 'idle';
       })
       .addCase(join.rejected, (state, action) => {
         state.status = 'failed';
@@ -133,6 +131,9 @@ const slice = createSlice({
         } else {
           state.errorMessage = 'An error occurred while deleting chat';
         }
+      })
+      .addCase(connect.type, state => {
+        state.status = 'loading'; // loading state, because we waiting websoccket server to answer with 'all_chats' event
       });
   },
 });

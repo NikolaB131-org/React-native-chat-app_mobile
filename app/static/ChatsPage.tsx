@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import ChatPreview, { ItemsSeparator } from '../shared/ChatPreview';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import { useSelector } from 'react-redux';
-import { chatsChatsSelector } from '../core/chats/selectors';
+import { chatsChatsSelector, chatsStatusSelector } from '../core/chats/selectors';
 import { useAppDispatch } from '../core/redux/hooks';
 import { authUserIdSelector } from '../core/auth/selectors';
 import LeaveSvg from '../assets/leave.svg';
@@ -17,12 +17,14 @@ import { Sizes } from '../core/constants/sizes';
 import TextInputModal from '../shared/TextInputModal';
 import { create } from '../core/chats/thunks';
 import { setCurrentChatName } from '../core/chats/reducer';
+import Spinner from '../shared/Spinner';
 
 type Props = StackScreenProps<RootStackParamList, 'Chats'>;
 
 function ChatsPage({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const chats = useSelector(chatsChatsSelector);
+  const status = useSelector(chatsStatusSelector);
   const userId = useSelector(authUserIdSelector);
 
   const [isAddChatModalVisible, setIsAddChatModalVisible] = useState(false);
@@ -64,21 +66,31 @@ function ChatsPage({ navigation }: Props) {
     dispatch(setCurrentChatName(name));
   };
 
+  useEffect(() => {
+    console.log(status);
+  }, [status]);
+
   return (
     <>
-      <FlatList
-        contentContainerStyle={styles.container}
-        data={chats}
-        ItemSeparatorComponent={ItemsSeparator}
-        renderItem={({ item }) => (
-          <ChatPreview
-            imageUrl={item.imageUrl}
-            name={item.name}
-            messages={item.messages}
-            onPress={() => onChatPreviewPress(item.id, item.name)}
-          />
-        )}
-      />
+      {status === 'loading' ? (
+        <View style={styles.spinnerContainer}>
+          <Spinner />
+        </View>
+      ) : (
+        <FlatList
+          contentContainerStyle={styles.container}
+          data={chats}
+          ItemSeparatorComponent={ItemsSeparator}
+          renderItem={({ item }) => (
+            <ChatPreview
+              imageUrl={item.imageUrl}
+              name={item.name}
+              messages={item.messages}
+              onPress={() => onChatPreviewPress(item.id, item.name)}
+            />
+          )}
+        />
+      )}
       <TextInputModal
         titleText="Enter the chat name"
         initialValue=""
@@ -105,6 +117,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
+  },
+  spinnerContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 50,
+    bottom: 0,
+    alignItems: 'center',
   },
 });
 
