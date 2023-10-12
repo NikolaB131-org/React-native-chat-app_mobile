@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, StatusBar, StyleSheet } from 'react-native';
 import MyTextInput from './MyTextInput';
 import { Colors } from '../core/constants/colors';
@@ -7,7 +7,7 @@ import MyText from './MyText';
 const BORDER_RADIUS = 12;
 const BACKGROUND_COLOR = 'rgba(0, 0, 0, 0.3)';
 
-type Props = {
+export type Props = {
   titleText?: string;
   initialValue?: string;
   placeholder?: string;
@@ -17,7 +17,11 @@ type Props = {
 };
 
 function TextInputModal({ titleText, initialValue = '', placeholder, isVisible, setIsVisible, onConfirm }: Props) {
-  const [inputValue, setInputValue] = useState(initialValue);
+  const [inputValue, setInputValue] = useState('');
+
+  useEffect(() => {
+    setInputValue(initialValue);
+  }, [initialValue]);
 
   const onConfirmPressed = () => {
     onConfirm(inputValue);
@@ -28,7 +32,7 @@ function TextInputModal({ titleText, initialValue = '', placeholder, isVisible, 
   return (
     <Modal transparent visible={isVisible}>
       <StatusBar backgroundColor={BACKGROUND_COLOR} />
-      <Pressable style={styles.wrapper} onPress={() => setIsVisible(false)}>
+      <Pressable testID="wrapper" style={styles.wrapper} onPress={() => setIsVisible(false)}>
         <Pressable style={styles.container}>
           {titleText && <MyText style={styles.titleText}>{titleText}</MyText>}
           <MyTextInput
@@ -38,7 +42,7 @@ function TextInputModal({ titleText, initialValue = '', placeholder, isVisible, 
             autoFocus
             placeholder={placeholder}
           />
-          <Pressable style={styles.button} onPress={onConfirmPressed}>
+          <Pressable testID="confirmButton" style={styles.button} onPress={onConfirmPressed}>
             <MyText style={styles.buttonText}>Confirm</MyText>
           </Pressable>
         </Pressable>

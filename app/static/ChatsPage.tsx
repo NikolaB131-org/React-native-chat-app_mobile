@@ -16,6 +16,7 @@ import Config from 'react-native-config';
 import { Sizes } from '../core/constants/sizes';
 import TextInputModal from '../shared/TextInputModal';
 import { create } from '../core/chats/thunks';
+import { setCurrentChatName } from '../core/chats/reducer';
 
 type Props = StackScreenProps<RootStackParamList, 'Chats'>;
 
@@ -58,6 +59,11 @@ function ChatsPage({ navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onChatPreviewPress = (id: string, name: string) => {
+    navigation.push('Chat', { chatId: id });
+    dispatch(setCurrentChatName(name));
+  };
+
   return (
     <>
       <FlatList
@@ -69,12 +75,13 @@ function ChatsPage({ navigation }: Props) {
             imageUrl={item.imageUrl}
             name={item.name}
             messages={item.messages}
-            onPress={() => navigation.push('Chat', { chatId: item.id, chatName: item.name })}
+            onPress={() => onChatPreviewPress(item.id, item.name)}
           />
         )}
       />
       <TextInputModal
         titleText="Enter the chat name"
+        initialValue=""
         placeholder="Lorem ipsum :)"
         isVisible={isAddChatModalVisible}
         setIsVisible={setIsAddChatModalVisible}

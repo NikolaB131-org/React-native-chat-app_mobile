@@ -21,7 +21,7 @@ import SendSvg from '../assets/send.svg';
 import { Colors } from '../core/constants/colors';
 import { Sizes } from '../core/constants/sizes';
 import { deleteChat, leave, updateName } from '../core/chats/thunks';
-import { setCurrentChatName, setStatus } from '../core/chats/reducer';
+import { setStatus } from '../core/chats/reducer';
 import TextInputModal from '../shared/TextInputModal';
 
 const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
@@ -29,7 +29,7 @@ const ItemsSeparator = () => <View style={styles.itemsSeparator} />;
 type Props = StackScreenProps<RootStackParamList, 'Chat'>;
 
 function ChatPage({ navigation, route }: Props) {
-  const { chatId, chatName } = route.params;
+  const { chatId } = route.params;
 
   const dispatch = useAppDispatch();
   const chats = useSelector(chatsChatsSelector);
@@ -39,7 +39,11 @@ function ChatPage({ navigation, route }: Props) {
 
   const [chatData, setChatData] = useState<ChatType | null>(null);
   const [messageInputValue, setMessageInputValue] = useState('');
-  const [isTextInputModalVisible, setIsTextInputModalVisible] = useState(false);
+  const [IsChangeHeaderTextModalVisible, setIsChangeHeaderTextModalVisible] = useState(false);
+
+  const onEditButtonPress = () => {
+    setIsChangeHeaderTextModalVisible(true);
+  };
 
   const onLeaveButtonPress = async () => {
     await dispatch(leave(chatId));
@@ -59,7 +63,7 @@ function ChatPage({ navigation, route }: Props) {
 
     return (
       <View style={styles.container}>
-        <Pressable style={styles.button} onPress={() => setIsTextInputModalVisible(true)}>
+        <Pressable style={styles.button} onPress={onEditButtonPress}>
           <EditSvg width={22} height="100%" />
         </Pressable>
         <Pressable style={styles.button} onPress={onLeaveButtonPress}>
@@ -74,7 +78,6 @@ function ChatPage({ navigation, route }: Props) {
 
   useEffect(() => {
     navigation.setOptions({ headerRight: getHeaderRight });
-    dispatch(setCurrentChatName(chatName));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -108,9 +111,9 @@ function ChatPage({ navigation, route }: Props) {
   return (
     <>
       <TextInputModal
-        isVisible={isTextInputModalVisible}
-        setIsVisible={setIsTextInputModalVisible}
-        initialValue={chatName}
+        isVisible={IsChangeHeaderTextModalVisible}
+        setIsVisible={setIsChangeHeaderTextModalVisible}
+        initialValue={currentChatName}
         onConfirm={onHeaderTitleChange}
       />
       <View style={styles.container}>

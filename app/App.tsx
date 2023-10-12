@@ -18,7 +18,7 @@ import SearchPage from './static/SearchPage';
 export type RootStackParamList = {
   Login: undefined;
   Chats: undefined;
-  Chat: { chatId: string; chatName: string };
+  Chat: { chatId: string };
   Search: undefined;
 };
 

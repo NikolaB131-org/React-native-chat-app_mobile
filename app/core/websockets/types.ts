@@ -11,12 +11,12 @@ export type WSAuthEvent = {
   token: string;
 };
 
-type WSAllChatsEvent = {
+export type WSAllChatsEvent = {
   event: 'all_chats';
   chats: ChatType[];
 };
 
-type WSReceiveMessageEvent = {
+export type WSReceiveMessageEvent = {
   event: 'receive_message';
   chatId: string;
   id: string;

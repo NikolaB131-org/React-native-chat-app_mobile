@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { InitiialState } from './types';
-import { WSAllChatsEvent, WSReceiveMessageEvent } from '../websockets/websocketsMiddleware';
+import { WSAllChatsEvent, WSReceiveMessageEvent } from '../websockets/types';
 import { create, deleteChat, join, leave, search, updateName } from './thunks';
 import { logout } from '../auth/thunks';
 
